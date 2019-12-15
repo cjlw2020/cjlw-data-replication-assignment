@@ -99,7 +99,7 @@ ggplot(df, aes(age, mass))+
 ```
 ```{r, fig.width= 4,fig.height=4}
 plot(age,mass)
-lines(x,predict(model.logistic),col="red")
+lines(age,predict(model.logistic),col="red")
 ```
 
 
@@ -122,7 +122,7 @@ lines(age, predict(model.gompertz),col="red",lty=2,lwd=3)
 ```
 ```{r, fig.width= 4,fig.height=4}
 plot(age,mass)
-lines(x,predict(model.gompertz),col="red")
+lines(age,predict(model.gompertz),col="red")
 ```
 ```{r, fig.width= 4,fig.height=4}
 p <- ggplot(data = df, aes(age,mass)) +
@@ -144,7 +144,7 @@ summary(lord.model)
 ```
 ```{r, fig.width= 4,fig.height=4}
 plot(age,mass)
-lines(x,predict(lord.model),col="red")
+lines(age,predict(lord.model),col="red")
 ```
 ```{r, fig.width= 4,fig.height=4}
 p <- ggplot(data = df, aes(age,mass)) +
@@ -161,7 +161,7 @@ p
 
 #Table 1.
 ```{r}
-age
+head(age)
 ```
 
 ```{r}
