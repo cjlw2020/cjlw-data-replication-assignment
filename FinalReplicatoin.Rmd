@@ -1,0 +1,177 @@
+---
+title: "FinalReplication"
+author: "cjlw2020"
+date: "12/11/2019"
+output: html_document
+---
+#Packages Needed
+```{r}
+library(lme4)
+library(car)
+library(optimx)
+library(deSolve)
+library(ggplot2)
+library(data.table)
+```
+```{r}
+ setwd("C:/Users/clint/Desktop/AN597_Project/Individule/doi_10.5061_dryad.0r31r__v1")
+df <- read.table("hog.txt", header = TRUE)
+head(df)
+```
+
+```{r}
+summary(df)
+```
+```{r}
+plot(df)
+```
+#Non-linear least squares attempt:
+```{r}
+mass <- c(df$mass)
+age1 <- c(df$age)
+age <- age1/365 #Changes age from days to years
+m <-nls(mass~a*age/(b+age))
+cor(mass,predict(m)) #Shows how well the model fits
+```
+
+```{r}
+plot(age,mass)
+lines(age,predict(m),lty=2,col="red",lwd=3)
+```
+#Find Rate of Growth
+```{r}
+RoG <- (log(max(mass)/min(mass)))/(max(age)) 
+RoG #Rate of Growth, didnt work
+```
+```{r}
+a_start<- 0.2 #param a is the y value when "x=0"
+b_start<- 0.06523683 #b is the growth rate
+```
+```{r}
+k <-nls(mass~a*exp(-b*age),start=list(a=a_start,b=b_start))
+cor(mass,predict(k)) 
+```
+```{r}
+plot(age,mass)
+lines(age,predict(k),col="red",lty=2,lwd=3) #This is not working properly
+```
+
+#Models
+
+Starting Variables
+```{r}
+t1 <- max(mass) #maximum value from the data, our starting  value for "theta1", parameter for the asymptote of growth
+new <- lm(logit(mass/t1)~age,data=df) #logistic values for mass divided by the asymptote (an approximation of the curve values for each individual)
+t2 <- new$coef[1] #starting value for "theta2", parameter of the midpoint of the growth curve
+t3 <- new$coef[2] #starting value for "theta3", parameter of the rate of growth
+```
+
+#Logistic Model:
+```{r}
+l <- function(age,theta1,theta2,theta3) {theta1/(1+exp(-(theta2+theta3*age)))} #here we're writing out the function for logistic growth (this is how we tell R what function we're using to model growth... like the function in the table in your paper), which estimates parameters "theta1", "theta2", and "theta3" for changes in a variable (like "BW") based on "AGE".
+model.logistic <- nls(mass ~ theta1/(1+exp(-(theta2+theta3*age))), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
+```
+or...
+```{r}
+model.logistic <- nls(mass ~ l(age,theta1,theta2,theta3), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
+summary(model.logistic) #this should give you the estimates for "theta1", "theta2", and "theta3" based on the data.
+```
+```{r}
+plot(age,mass)
+lines(age, predict(model.logistic),col="red",lty=2,lwd=3)
+```
+```{r, fig.width= 4,fig.height=4}
+t <- ggplot(data = df, aes(age,mass)) +
+  geom_smooth(model = model.logistic, se = TRUE, color = "red", size = 0.5, linetype = 2, alpha = 0.15)  +
+  geom_point(aes(age,mass), size = 1, shape = 21, stroke = 1) +
+  theme_test() +
+  scale_y_continuous(lim = c(0.20, 0.56), breaks = c(0.24,0.28, 0.32, 0.36, 0.40, 0.44, 0.48, 0.52, 0.56))
+  #scale_x_continuous(lim = c(0, 15), breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
+t <- t + xlab("Age (years)") + ylab("Lens mass (g)") 
+t
+```
+#Trying to place model properly into graph, not working
+```{r}
+ggplot(df, aes(age, mass))+
+  geom_point() +
+# Add the line using the fortified fit data, plotting the x vs. the fitted values
+  geom_line(data = fortify(df), aes(x = age, y = mass))
+```
+```{r, fig.width= 4,fig.height=4}
+plot(age,mass)
+lines(x,predict(model.logistic),col="red")
+```
+
+
+
+
+#Gompertz Modle: 
+For Gompertz, everything the same, but the equation/function used (again, for Lord you'd get this from translating the model equations in your table to R code):
+```{r}
+g <- function(age,theta1,theta2,theta3){theta1*exp(-exp(-(theta3*(age-theta2))))}
+model.gompertz <- nls(mass ~ theta1*exp(-exp(-(theta3*(age-theta2)))), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
+```
+or...
+```{r}
+model.gompertz <- nls(mass ~ g(age,theta1,theta2,theta3), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
+summary(model.gompertz)
+```
+```{r}
+plot(age,mass)
+lines(age, predict(model.gompertz),col="red",lty=2,lwd=3)
+```
+```{r, fig.width= 4,fig.height=4}
+plot(age,mass)
+lines(x,predict(model.gompertz),col="red")
+```
+```{r, fig.width= 4,fig.height=4}
+p <- ggplot(data = df, aes(age,mass)) +
+  geom_smooth(model = model.gompertz, color = "red", size = 0.5, linetype = 2, alpha = 0.15)  +
+  geom_point(aes(age,mass), size = 1, shape = 21, stroke = 1) +
+  theme_test() +
+  scale_y_continuous(lim = c(0.20, 0.56), breaks = c(0.24,0.28, 0.32, 0.36, 0.40, 0.44, 0.48, 0.52, 0.56))
+  #scale_x_continuous(lim = c(0, 15), breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
+p <- p + xlab("Age (years)") + ylab("Lens mass (g)") 
+p
+```
+
+#Lord Model: Something isn't right because every figure looks the same
+```{r}
+#Lord Model 
+L <- function(age,theta1,theta3,alpha){theta1*exp(-theta3/age + 0.62)}
+lord.model <- nls(mass ~ L(age,theta1,theta3), data=df, start=list(theta1=t1,theta3=t3))
+summary(lord.model)
+```
+```{r, fig.width= 4,fig.height=4}
+plot(age,mass)
+lines(x,predict(lord.model),col="red")
+```
+```{r, fig.width= 4,fig.height=4}
+p <- ggplot(data = df, aes(age,mass)) +
+  geom_smooth(model = lord.model, color = "red", size = 0.5, linetype = 2, alpha = 0.15)  +
+  geom_point(aes(age,mass), size = 1, shape = 21, stroke = 1) +
+  theme_test() +
+  scale_y_continuous(lim = c(0.20, 0.56), breaks = c(0.24,0.28, 0.32, 0.36, 0.40, 0.44, 0.48, 0.52, 0.56))
+  #scale_x_continuous(lim = c(0, 15), breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
+p <- p + xlab("Age (years)") + ylab("Lens mass (g)") 
+p
+```
+
+#Tables
+
+#Table 1.
+```{r}
+age
+```
+
+```{r}
+Age_class_years <- c(0:10,"Total")
+n <- c(23,20,12,10,19,9,5,3,3,2,5,11)
+T1.df <- data.frame(Age_class_years,n)
+T1.df
+```
+```{r}
+setDT(T1.df)
+```
+
+#Table
