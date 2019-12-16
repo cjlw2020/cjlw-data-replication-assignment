@@ -195,12 +195,13 @@ setDT(T1.df)
 ```
 
 ###Table 3.
-Values Pulled from summary stats above. I previosuly did not change the greek terminology from (theta1,theta2,theta3) to (gamma,alpha,beta) to simplify my anlaysis above. I am now transforming those values to more correctly allign with the original table. 
+
+Values Pulled from summary statistics for each model above. I previosuly did not change the greek terminology from (theta1,theta2,theta3) to (gamma,alpha,beta) to simplify my anlaysis above. I am now transforming those values to  correctly allign with the original table. 
 ```{r}
 Model_name <- c("Lord","Lord stderr","Logistic","Logistic stderr","Gompertz","Gompertz stderr")
-gamma <- c(0.259,(0.003),0.488,(0.006),0.495,(0.007))
-alpha <- c("NA","NA",-0.303,(0.0431),-72.8,(28.5))
-beta <- c(190,(8.47),0.00145,(0.0000888),0.00117,(0.0000743))
+gamma <- c(0.259,(0.003),0.488,(0.006),0.495,(0.007)) #Values previoulsy allign with theta1
+alpha <- c("NA","NA",-0.303,(0.0431),-72.8,(28.5)) #Values Previously allign with theta2
+beta <- c(190,(8.47),0.00145,(0.0000888),0.00117,(0.0000743)) #Values previosuly allign with theta3
 T3.df <- data.frame(Model_name,gamma,alpha,beta)
 T3.df
 
