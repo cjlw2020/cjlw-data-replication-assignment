@@ -95,14 +95,10 @@ t3 <- new$coef[2] #starting value for "theta3", parameter of the rate of growth
 
 ### Logistic Model:
 ```{r eval=FALSE}
-l <- function(age,theta1,theta2,theta3) {theta1/(1+exp(-(theta2+theta3*age)))}
-model.logistic <- nls(mass ~ theta1/(1+exp(-(theta2+theta3*age))), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
+l <- function(age,gamma,alpha,beta) {gamma/(1+exp(-(alpha+beta*age)))}
+model.logistic <- nls(mass ~ g(age,gamma,alpha,beta), data=df, start=list(gamma=t1,alpha=t2,beta=t3))
 ```
-or...
-```{r eval=FALSE}
-model.logistic <- nls(mass ~ l(age,theta1,theta2,theta3), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
-summary(model.logistic) #estimates based on parameters
-```
+
 ```{r eval=FALSE, fig.width= 4,fig.height=4}
 t <- ggplot(data = df, aes(age,mass)) +
   geom_smooth(model = model.logistic, se = TRUE, color = "red", size = 0.5, linetype = 2, alpha = 0.15)  +
@@ -136,12 +132,9 @@ lines(age, fitted(model.logistic), lty = 2, col = "red", lwd = 2)
 ### Gompertz Modle: 
 For Gompertz, everything the same, but the equation/function used (again, for Lord you'd get this from translating the model equations in your table to R code):
 ```{r eval=FALSE}
-g <- function(age,theta1,theta2,theta3){theta1*exp(-exp(-(theta3*(age-theta2))))}
-model.gompertz <- nls(mass ~ theta1*exp(-exp(-(theta3*(age-theta2)))), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
-```
-or...
-```{r eval=FALSE}
-model.gompertz <- nls(mass ~ g(age,theta1,theta2,theta3), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
+g <- function(age,gamma,alpha,beta){gamma*exp(-exp(-(beta*(age-alpha))))}
+model.gompertz <- nls(mass ~ gamma*exp(-exp(-(beta*(age-alpha)))), data=df, start=list(gamma=t1,alpha=t2,beta=t3))
+
 summary(model.gompertz)
 ```
 ```{r eval=FALSE, fig.width= 4,fig.height=4}
@@ -163,7 +156,7 @@ p
 ### Lord Model: Something isn't right because every figure looks the same
 ```{r eval=FALSE}
 L <- function(age,gamma,beta,alpha){gamma*exp(-(beta)/age + alpha)}
-lord.model <- nls(mass ~ L(age,gamma,beta,alpha), data=df, start=list(gamma=t1,beta=,alpha=0.45))
+lord.model <- nls(mass ~ L(age,gamma,beta,alpha), data=df, start=list(gamma=t1,beta=,alpha=(age))
 summary(lord.model)
 ```
 
@@ -186,10 +179,6 @@ p
 ## Tables
 
 ### Table 1.
-```{r eval=FALSE}
-head(age)
-```
-
 ```{r eval=FALSE}
 Age_class_years <- c(0:10,"Total")
 n <- c(23,20,12,10,19,9,5,3,3,2,5,11)
