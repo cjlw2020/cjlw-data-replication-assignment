@@ -36,7 +36,7 @@ library(data.table)
 ```
 ## Importing the txt. file into R
 ```{r eval=FALSE}
- setwd("C:/Users/clint/Desktop/AN597_Project/Individule/doi_10.5061_dryad.0r31r__v1")
+   setwd("C:/Users/clint/Desktop/AN597_Project/Individule/Data/doi_10.5061_dryad.0r31r__v1")
 df <- read.table("hog.txt", header = TRUE)
 head(df)
 ```
