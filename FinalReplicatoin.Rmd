@@ -20,7 +20,7 @@ After re-reading the paper multiple times I have determined that the Lord Model,
 Provided in a txt. file were hog deer age, lens mass, and tag number. From the original text I will be attempting to recreate Table 1, Table 2, and Figure 1. 
 
 ##Packages Needed
-```{r}
+```{r eval=FALSE}
 library(lme4)
 library(car)
 library(optimx)
@@ -29,22 +29,22 @@ library(ggplot2)
 library(data.table)
 ```
 ##Importing the txt. file into R
-```{r}
+```{r eval=FALSE}
  setwd("C:/Users/clint/Desktop/AN597_Project/Individule/doi_10.5061_dryad.0r31r__v1")
 df <- read.table("hog.txt", header = TRUE)
 head(df)
 ```
 
-```{r}
+```{r eval=FALSE}
 summary(df) #Just for my informational purpouses
 ```
-```{r}
+```{r eval=FALSE}
 plot(df) #A first look at the provided data
 ```
 ## Non-linear least squares attempt:
 
 We had no gone over non-linear models in class before so I felt that it was important for me to get a beter grasp of how R processes this information. Below I follow a series of steps to create a basic non-liner least squares regression that follows my data. 
-```{r}
+```{r eval=FALSE}
 mass <- c(df$mass)
 age1 <- c(df$age)
 age <- age1/365 #Changes age from days to years
@@ -52,26 +52,25 @@ m <-nls(mass~a*age/(b+age))
 cor(mass,predict(m)) #This is an indicator of how well the model fits the data. Everythihg I found online indicated that the warning below is normal and nothing to worry about
 ```
 
-```{r}
+```{r eval=FALSE}
 plot(age,mass) 
 lines(age,predict(m),lty=2,col="red",lwd=3) #Plot the model agenst the data
 ```
 ### Finding the Rate of Growth
 
 Here I attempt to determin the logarithmic rate of growth for the models below
-```{r}
+```{r eval=FALSE}
 RoG <- (log(max(mass)/min(mass)))/(max(age)) 
 RoG
 ```
-```{r}
+```{r eval=FALSE}
 a_start<- 0.2 #param a is the y value when "x=0"
 b_start<- 0.06523683 #b is the growth rate
-```
-```{r}
 k <-nls(mass~a*exp(-b*age),start=list(a=a_start,b=b_start))
 cor(mass,predict(k)) #The predicted outcome is not as good as the previos attempt
 ```
-```{r}
+
+```{r eval=FALSE}
 plot(age,mass)
 lines(age,predict(k),col="red",lty=2,lwd=3) #Something in this model did not line up correctly. As you can see from the figure below, my line does not trend with the data
 ```
@@ -81,7 +80,7 @@ lines(age,predict(k),col="red",lty=2,lwd=3) #Something in this model did not lin
 From the original paper I attempted to recreate 3 of the 5 statistical models. I was provided contextual code for the Logistic and Gompertz models by Prof. Schmitt to recreate the Lords model. As I mentioned in my opening statment, the lord model in the paper is based on baysian concenpts that exceed my current statistical abilities R. I attempt to recreate the equation found in Table 2. for the Lords model through the same operations viewed from the Logistic and Gompertz models. 
 
 ### Starting Variables
-```{r}
+```{r eval=FALSE}
 t1 <- max(mass) #maximum value from the data, our starting  value for "theta1", parameter for the asymptote of growth
 new <- lm(logit(mass/t1)~age,data=df) #logistic values for mass divided by the asymptote (an approximation of the curve values for each individual)
 t2 <- new$coef[1] #starting value for "theta2", parameter of the midpoint of the growth curve
@@ -89,12 +88,12 @@ t3 <- new$coef[2] #starting value for "theta3", parameter of the rate of growth
 ```
 
 ###Logistic Model:
-```{r}
+```{r eval=FALSE}
 l <- function(age,theta1,theta2,theta3) {theta1/(1+exp(-(theta2+theta3*age)))} #here we're writing out the function for logistic growth (this is how we tell R what function we're using to model growth... like the function in the table in your paper), which estimates parameters "theta1", "theta2", and "theta3" for changes in a variable (like "BW") based on "AGE".
 model.logistic <- nls(mass ~ theta1/(1+exp(-(theta2+theta3*age))), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
 ```
 or...
-```{r}
+```{r eval=FALSE}
 model.logistic <- nls(mass ~ l(age,theta1,theta2,theta3), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
 summary(model.logistic) #this should give you the estimates for "theta1", "theta2", and "theta3" based on the data.
 ```
@@ -114,11 +113,12 @@ plot(age,mass)
 lines(age,predict(model.logistic),col="red",lty=2,lwd=1)
 ```
 Confidence interval maybe
-```{r}
+```{r eval=FALSE}
 conf <- confint(model.logistic)
 conf
 ```
-```{r}
+
+```{r eval=FALSE}
 plot(mass ~ age) #this doesnt work, tried to figure out the confidence interval
 lines(age, fitted(model.logistic), lty = 2, col = "red", lwd = 2)
 lines(age, model.logistic(1:100, conf[1, 1], conf[2, 1], conf[3, 1], conf[4, 1]), lty = 2, 
@@ -129,12 +129,12 @@ lines(age, model.logistic(1:100, conf[1, 2], conf[2, 2], conf[3, 2], conf[4, 2])
 
 #Gompertz Modle: 
 For Gompertz, everything the same, but the equation/function used (again, for Lord you'd get this from translating the model equations in your table to R code):
-```{r}
+```{r eval=FALSE}
 g <- function(age,theta1,theta2,theta3){theta1*exp(-exp(-(theta3*(age-theta2))))}
 model.gompertz <- nls(mass ~ theta1*exp(-exp(-(theta3*(age-theta2)))), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
 ```
 or...
-```{r}
+```{r eval=FALSE}
 model.gompertz <- nls(mass ~ g(age,theta1,theta2,theta3), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
 summary(model.gompertz)
 ```
@@ -154,16 +154,17 @@ p
 ```
 
 #Lord Model: Something isn't right because every figure looks the same
-```{r}
-#Lord Model 
+```{r eval=FALSE}
 L <- function(age,theta1,theta3,alpha){theta1*exp(-theta3/age + 0.62)}
 lord.model <- nls(mass ~ L(age,theta1,theta3), data=df, start=list(theta1=t1,theta3=t3))
 summary(lord.model)
 ```
+
 ```{r, fig.width= 4,fig.height=4}
 plot(age,mass)
 lines(age,predict(lord.model),col="red",lty=2,lwd=1)
 ```
+
 ```{r, fig.width= 4,fig.height=4}
 p <- ggplot(data = df, aes(age,mass)) +
   geom_smooth(model = lord.model, color = "red", size = 0.5, linetype = 2, alpha = 0.15)  +
@@ -178,17 +179,17 @@ p
 #Tables
 
 #Table 1.
-```{r}
+```{r eval=FALSE}
 head(age)
 ```
 
-```{r}
+```{r eval=FALSE}
 Age_class_years <- c(0:10,"Total")
 n <- c(23,20,12,10,19,9,5,3,3,2,5,11)
 T1.df <- data.frame(Age_class_years,n)
 T1.df
 ```
-```{r}
+```{r eval=FALSE}
 setDT(T1.df)
 ```
 
