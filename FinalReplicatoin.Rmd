@@ -54,7 +54,7 @@ We had no gone over non-linear models in class before so I felt that it was impo
 mass <- c(df$mass)
 age1 <- c(df$age)
 age <- age1/365 #Changes age from days to years
-m <-nls(mass~a*age/(b+age))
+m <-nls(mass ~ a*age/(b+age))
 cor(mass,predict(m)) #This is an indicator of how well the model fits the data. Everythihg I found online indicated that the warning below is normal and nothing to worry about
 ```
 
@@ -95,13 +95,13 @@ t3 <- new$coef[2] #starting value for "theta3", parameter of the rate of growth
 
 ###Logistic Model:
 ```{r eval=FALSE}
-l <- function(age,theta1,theta2,theta3) {theta1/(1+exp(-(theta2+theta3*age)))} #here we're writing out the function for logistic growth (this is how we tell R what function we're using to model growth... like the function in the table in your paper), which estimates parameters "theta1", "theta2", and "theta3" for changes in a variable (like "BW") based on "AGE".
+l <- function(age,theta1,theta2,theta3) {theta1/(1+exp(-(theta2+theta3*age)))}
 model.logistic <- nls(mass ~ theta1/(1+exp(-(theta2+theta3*age))), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
 ```
 or...
 ```{r eval=FALSE}
 model.logistic <- nls(mass ~ l(age,theta1,theta2,theta3), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
-summary(model.logistic) #this should give you the estimates for "theta1", "theta2", and "theta3" based on the data.
+summary(model.logistic) #estimates based on parameters
 ```
 ```{r eval=FALSE, fig.width= 4,fig.height=4}
 t <- ggplot(data = df, aes(age,mass)) +
@@ -113,7 +113,7 @@ t <- ggplot(data = df, aes(age,mass)) +
 t <- t + xlab("Age (years)") + ylab("Lens mass (g)") 
 t
 ```
-#Trying to place model properly into graph, not working
+###Trying to place model properly into graph, not working
 ```{r eval=FALSE, fig.width= 4,fig.height=4}
 plot(age,mass)
 lines(age,predict(model.logistic),col="red",lty=2,lwd=1)
@@ -133,7 +133,7 @@ lines(age, fitted(model.logistic), lty = 2, col = "red", lwd = 2)
     #lwd = 1, col = "blue")
 ```
 
-#Gompertz Modle: 
+##Gompertz Modle: 
 For Gompertz, everything the same, but the equation/function used (again, for Lord you'd get this from translating the model equations in your table to R code):
 ```{r eval=FALSE}
 g <- function(age,theta1,theta2,theta3){theta1*exp(-exp(-(theta3*(age-theta2))))}
@@ -160,10 +160,10 @@ p <- p + xlab("Age (years)") + ylab("Lens mass (g)")
 p
 ```
 
-#Lord Model: Something isn't right because every figure looks the same
+##Lord Model: Something isn't right because every figure looks the same
 ```{r eval=FALSE}
-L <- function(age,theta1,theta3,alpha){theta1*exp(-theta3/age + 0.62)}
-lord.model <- nls(mass ~ L(age,theta1,theta3), data=df, start=list(theta1=t1,theta3=t3))
+L <- function(age,gamma,beta,alpha){gamma*exp(-beta/age + alpha)}
+lord.model <- nls(mass ~ L(age,gamma,beta,alpha), data=df, start=list(gamma=0.23,beta=190,alpha=0.62))
 summary(lord.model)
 ```
 
