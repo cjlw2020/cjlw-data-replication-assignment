@@ -13,11 +13,17 @@ output:
 
 # Estimating age and age class of harvested hog deer from eye lens mass using frequentist and Bayesian methods
 
+![](imgg/Hog deer.jpg)
+
 Published by the Nordic Board of Wildlife Research in 2016, David M. Forsyth et al looked at the relationship between hog deer age and eye lens mass. Determining age, postmortem, is often a critical analysis of wildlife condition. Often molar erosion has been the primary method of age determine for large ruminant mammals, but it is an imprecise measure. Based in Australia, young hog deer were tagged and harvested between 4 months and 15 years later. Lenses were collected from both eyeballs and determined that there was no significant difference lens mass between two individual eyes of the same deer. 5 models were used to replicate the non-linear function expressed between deer age and lens mass. The logistic function appeared to represent the data best. 
 
 After re-reading the paper multiple times I have determined that the Lord Model, that I was asked to recreate, is based on Bayesian principals that exceeded my current statistical abilities in R. I proceeded with my model in the manner expressed to me given the logistic model and hope its representation is adequate to the figures of the original paper. 
 
 Provided in a txt. file were hog deer age, lens mass, and tag number. From the original text I will be attempting to recreate Table 1, Table 2, and Figure 1. 
+
+![](imgg/OG Table 1.png)
+![](imgg/OG Table 3.png)
+![](imgg/OG Figure 1.png)
 
 ## Packages Needed
 ```{r eval=FALSE}
