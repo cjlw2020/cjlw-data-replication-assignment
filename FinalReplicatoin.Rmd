@@ -93,7 +93,7 @@ t2 <- new$coef[1] #starting value for "theta2", parameter of the midpoint of the
 t3 <- new$coef[2] #starting value for "theta3", parameter of the rate of growth
 ```
 
-###Logistic Model:
+### Logistic Model:
 ```{r eval=FALSE}
 l <- function(age,theta1,theta2,theta3) {theta1/(1+exp(-(theta2+theta3*age)))}
 model.logistic <- nls(mass ~ theta1/(1+exp(-(theta2+theta3*age))), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
@@ -113,7 +113,7 @@ t <- ggplot(data = df, aes(age,mass)) +
 t <- t + xlab("Age (years)") + ylab("Lens mass (g)") 
 t
 ```
-###Trying to place model properly into graph, not working
+### Trying to place model properly into graph, not working
 ```{r eval=FALSE, fig.width= 4,fig.height=4}
 plot(age,mass)
 lines(age,predict(model.logistic),col="red",lty=2,lwd=1)
@@ -133,7 +133,7 @@ lines(age, fitted(model.logistic), lty = 2, col = "red", lwd = 2)
     #lwd = 1, col = "blue")
 ```
 
-##Gompertz Modle: 
+### Gompertz Modle: 
 For Gompertz, everything the same, but the equation/function used (again, for Lord you'd get this from translating the model equations in your table to R code):
 ```{r eval=FALSE}
 g <- function(age,theta1,theta2,theta3){theta1*exp(-exp(-(theta3*(age-theta2))))}
@@ -160,10 +160,10 @@ p <- p + xlab("Age (years)") + ylab("Lens mass (g)")
 p
 ```
 
-##Lord Model: Something isn't right because every figure looks the same
+### Lord Model: Something isn't right because every figure looks the same
 ```{r eval=FALSE}
-L <- function(age,gamma,beta,alpha){gamma*exp(-beta/age + alpha)}
-lord.model <- nls(mass ~ L(age,gamma,beta,alpha), data=df, start=list(gamma=0.23,beta=190,alpha=0.62))
+L <- function(age,gamma,beta,alpha){gamma*exp(-(beta)/age + alpha)}
+lord.model <- nls(mass ~ L(age,gamma,beta,alpha), data=df, start=list(gamma=t1,beta=,alpha=0.45))
 summary(lord.model)
 ```
 
@@ -183,9 +183,9 @@ p <- p + xlab("Age (years)") + ylab("Lens mass (g)")
 p
 ```
 
-##Tables
+## Tables
 
-###Table 1.
+### Table 1.
 ```{r eval=FALSE}
 head(age)
 ```
@@ -196,11 +196,8 @@ n <- c(23,20,12,10,19,9,5,3,3,2,5,11)
 T1.df <- data.frame(Age_class_years,n)
 T1.df
 ```
-```{r eval=FALSE}
-setDT(T1.df)
-```
 
-###Table 3.
+### Table 3.
 
 Values Pulled from summary statistics for each model above. I previosuly did not change the greek terminology from (theta1,theta2,theta3) to (gamma,alpha,beta) to simplify my anlaysis above. I am now transforming those values to  correctly allign with the original table. 
 ```{r}

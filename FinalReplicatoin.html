@@ -1547,7 +1547,7 @@ library(data.table)</code></pre>
 </div>
 <div id="importing-the-txt.-file-into-r" class="section level2">
 <h2>Importing the txt. file into R</h2>
-<pre class="r"><code> setwd(&quot;C:/Users/clint/Desktop/AN597_Project/Individule/doi_10.5061_dryad.0r31r__v1&quot;)
+<pre class="r"><code>   setwd(&quot;C:/Users/clint/Desktop/AN597_Project/Individule/Data/doi_10.5061_dryad.0r31r__v1&quot;)
 df &lt;- read.table(&quot;hog.txt&quot;, header = TRUE)
 head(df)</code></pre>
 <pre class="r"><code>summary(df) #Just for my informational purpouses</code></pre>
@@ -1559,7 +1559,7 @@ head(df)</code></pre>
 <pre class="r"><code>mass &lt;- c(df$mass)
 age1 &lt;- c(df$age)
 age &lt;- age1/365 #Changes age from days to years
-m &lt;-nls(mass~a*age/(b+age))
+m &lt;-nls(mass ~ a*age/(b+age))
 cor(mass,predict(m)) #This is an indicator of how well the model fits the data. Everythihg I found online indicated that the warning below is normal and nothing to worry about</code></pre>
 <pre class="r"><code>plot(age,mass) 
 lines(age,predict(m),lty=2,col=&quot;red&quot;,lwd=3) #Plot the model agenst the data</code></pre>
@@ -1585,12 +1585,14 @@ lines(age,predict(k),col=&quot;red&quot;,lty=2,lwd=3) #Something in this model d
 new &lt;- lm(logit(mass/t1)~age,data=df) #logistic values for mass divided by the asymptote (an approximation of the curve values for each individual)
 t2 &lt;- new$coef[1] #starting value for &quot;theta2&quot;, parameter of the midpoint of the growth curve
 t3 &lt;- new$coef[2] #starting value for &quot;theta3&quot;, parameter of the rate of growth</code></pre>
-<p>###Logistic Model:</p>
-<pre class="r"><code>l &lt;- function(age,theta1,theta2,theta3) {theta1/(1+exp(-(theta2+theta3*age)))} #here we&#39;re writing out the function for logistic growth (this is how we tell R what function we&#39;re using to model growth... like the function in the table in your paper), which estimates parameters &quot;theta1&quot;, &quot;theta2&quot;, and &quot;theta3&quot; for changes in a variable (like &quot;BW&quot;) based on &quot;AGE&quot;.
+</div>
+<div id="logistic-model" class="section level3">
+<h3>Logistic Model:</h3>
+<pre class="r"><code>l &lt;- function(age,theta1,theta2,theta3) {theta1/(1+exp(-(theta2+theta3*age)))}
 model.logistic &lt;- nls(mass ~ theta1/(1+exp(-(theta2+theta3*age))), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))</code></pre>
 <p>or…</p>
 <pre class="r"><code>model.logistic &lt;- nls(mass ~ l(age,theta1,theta2,theta3), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
-summary(model.logistic) #this should give you the estimates for &quot;theta1&quot;, &quot;theta2&quot;, and &quot;theta3&quot; based on the data.</code></pre>
+summary(model.logistic) #estimates based on parameters</code></pre>
 <pre class="r"><code>t &lt;- ggplot(data = df, aes(age,mass)) +
   geom_smooth(model = model.logistic, se = TRUE, color = &quot;red&quot;, size = 0.5, linetype = 2, alpha = 0.15)  +
   geom_point(aes(age,mass), size = 1, shape = 21, stroke = 1) +
@@ -1599,7 +1601,9 @@ summary(model.logistic) #this should give you the estimates for &quot;theta1&quo
   #scale_x_continuous(lim = c(0, 15), breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
 t &lt;- t + xlab(&quot;Age (years)&quot;) + ylab(&quot;Lens mass (g)&quot;) 
 t</code></pre>
-<p>#Trying to place model properly into graph, not working</p>
+</div>
+<div id="trying-to-place-model-properly-into-graph-not-working" class="section level3">
+<h3>Trying to place model properly into graph, not working</h3>
 <pre class="r"><code>plot(age,mass)
 lines(age,predict(model.logistic),col=&quot;red&quot;,lty=2,lwd=1)</code></pre>
 <p>Confidence interval maybe</p>
@@ -1611,7 +1615,10 @@ lines(age, fitted(model.logistic), lty = 2, col = &quot;red&quot;, lwd = 2)
     #lwd = 1, col = &quot;blue&quot;)
 #lines(age, model.logistic(1:100, conf[1, 2], conf[2, 2], conf[3, 2], conf[4, 2]), lty = 2, 
     #lwd = 1, col = &quot;blue&quot;)</code></pre>
-<p>#Gompertz Modle: For Gompertz, everything the same, but the equation/function used (again, for Lord you’d get this from translating the model equations in your table to R code):</p>
+</div>
+<div id="gompertz-modle" class="section level3">
+<h3>Gompertz Modle:</h3>
+<p>For Gompertz, everything the same, but the equation/function used (again, for Lord you’d get this from translating the model equations in your table to R code):</p>
 <pre class="r"><code>g &lt;- function(age,theta1,theta2,theta3){theta1*exp(-exp(-(theta3*(age-theta2))))}
 model.gompertz &lt;- nls(mass ~ theta1*exp(-exp(-(theta3*(age-theta2)))), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))</code></pre>
 <p>or…</p>
@@ -1627,9 +1634,11 @@ lines(age, predict(model.gompertz),col=&quot;red&quot;,lty=2,lwd=1)</code></pre>
   #scale_x_continuous(lim = c(0, 15), breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
 p &lt;- p + xlab(&quot;Age (years)&quot;) + ylab(&quot;Lens mass (g)&quot;) 
 p</code></pre>
-<p>#Lord Model: Something isn’t right because every figure looks the same</p>
-<pre class="r"><code>L &lt;- function(age,theta1,theta3,alpha){theta1*exp(-theta3/age + 0.62)}
-lord.model &lt;- nls(mass ~ L(age,theta1,theta3), data=df, start=list(theta1=t1,theta3=t3))
+</div>
+<div id="lord-model-something-isnt-right-because-every-figure-looks-the-same" class="section level3">
+<h3>Lord Model: Something isn’t right because every figure looks the same</h3>
+<pre class="r"><code>L &lt;- function(age,gamma,beta,alpha){gamma*exp(-(beta)/age + alpha)}
+lord.model &lt;- nls(mass ~ L(age,gamma,beta,alpha), data=df, start=list(gamma=t1,beta=,alpha=0.45))
 summary(lord.model)</code></pre>
 <pre class="r"><code>plot(age,mass)
 lines(age,predict(lord.model),col=&quot;red&quot;,lty=2,lwd=1)</code></pre>
@@ -1641,15 +1650,20 @@ lines(age,predict(lord.model),col=&quot;red&quot;,lty=2,lwd=1)</code></pre>
   #scale_x_continuous(lim = c(0, 15), breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
 p &lt;- p + xlab(&quot;Age (years)&quot;) + ylab(&quot;Lens mass (g)&quot;) 
 p</code></pre>
-<p>##Tables</p>
-<p>###Table 1.</p>
+</div>
+</div>
+<div id="tables" class="section level2">
+<h2>Tables</h2>
+<div id="table-1." class="section level3">
+<h3>Table 1.</h3>
 <pre class="r"><code>head(age)</code></pre>
 <pre class="r"><code>Age_class_years &lt;- c(0:10,&quot;Total&quot;)
 n &lt;- c(23,20,12,10,19,9,5,3,3,2,5,11)
 T1.df &lt;- data.frame(Age_class_years,n)
 T1.df</code></pre>
-<pre class="r"><code>setDT(T1.df)</code></pre>
-<p>###Table 3.</p>
+</div>
+<div id="table-3." class="section level3">
+<h3>Table 3.</h3>
 <p>Values Pulled from summary statistics for each model above. I previosuly did not change the greek terminology from (theta1,theta2,theta3) to (gamma,alpha,beta) to simplify my anlaysis above. I am now transforming those values to correctly allign with the original table.</p>
 <pre class="r"><code>Model_name &lt;- c(&quot;Lord&quot;,&quot;Lord stderr&quot;,&quot;Logistic&quot;,&quot;Logistic stderr&quot;,&quot;Gompertz&quot;,&quot;Gompertz stderr&quot;)
 gamma &lt;- c(0.259,(0.003),0.488,(0.006),0.495,(0.007)) #Values previoulsy allign with theta1
