@@ -19,7 +19,7 @@ After re-reading the paper multiple times I have determined that the Lord Model,
 
 Provided in a txt. file were hog deer age, lens mass, and tag number. From the original text I will be attempting to recreate Table 1, Table 2, and Figure 1. 
 
-#Packages Needed
+##Packages Needed
 ```{r}
 library(lme4)
 library(car)
@@ -28,6 +28,7 @@ library(deSolve)
 library(ggplot2)
 library(data.table)
 ```
+##Importing the txt. file into R
 ```{r}
  setwd("C:/Users/clint/Desktop/AN597_Project/Individule/doi_10.5061_dryad.0r31r__v1")
 df <- read.table("hog.txt", header = TRUE)
@@ -35,28 +36,32 @@ head(df)
 ```
 
 ```{r}
-summary(df)
+summary(df) #Just for my informational purpouses
 ```
 ```{r}
-plot(df)
+plot(df) #A first look at the provided data
 ```
-#Non-linear least squares attempt:
+## Non-linear least squares attempt:
+
+We had no gone over non-linear models in class before so I felt that it was important for me to get a beter grasp of how R processes this information. Below I follow a series of steps to create a basic non-liner least squares regression that follows my data. 
 ```{r}
 mass <- c(df$mass)
 age1 <- c(df$age)
 age <- age1/365 #Changes age from days to years
 m <-nls(mass~a*age/(b+age))
-cor(mass,predict(m)) #Shows how well the model fits
+cor(mass,predict(m)) #This is an indicator of how well the model fits the data. Everythihg I found online indicated that the warning below is normal and nothing to worry about
 ```
 
 ```{r}
-plot(age,mass)
-lines(age,predict(m),lty=2,col="red",lwd=3)
+plot(age,mass) 
+lines(age,predict(m),lty=2,col="red",lwd=3) #Plot the model agenst the data
 ```
-#Find Rate of Growth
+### Finding the Rate of Growth
+
+Here I attempt to determin the logarithmic rate of growth for the models below
 ```{r}
 RoG <- (log(max(mass)/min(mass)))/(max(age)) 
-RoG #Rate of Growth, didnt work
+RoG
 ```
 ```{r}
 a_start<- 0.2 #param a is the y value when "x=0"
@@ -64,16 +69,18 @@ b_start<- 0.06523683 #b is the growth rate
 ```
 ```{r}
 k <-nls(mass~a*exp(-b*age),start=list(a=a_start,b=b_start))
-cor(mass,predict(k)) 
+cor(mass,predict(k)) #The predicted outcome is not as good as the previos attempt
 ```
 ```{r}
 plot(age,mass)
-lines(age,predict(k),col="red",lty=2,lwd=3) #This is not working properly
+lines(age,predict(k),col="red",lty=2,lwd=3) #Something in this model did not line up correctly. As you can see from the figure below, my line does not trend with the data
 ```
 
-#Models
+## Starting Models
 
-Starting Variables
+From the original paper I attempted to recreate 3 of the 5 statistical models. I was provided contextual code for the Logistic and Gompertz models by Prof. Schmitt to recreate the Lords model. As I mentioned in my opening statment, the lord model in the paper is based on baysian concenpts that exceed my current statistical abilities R. I attempt to recreate the equation found in Table 2. for the Lords model through the same operations viewed from the Logistic and Gompertz models. 
+
+### Starting Variables
 ```{r}
 t1 <- max(mass) #maximum value from the data, our starting  value for "theta1", parameter for the asymptote of growth
 new <- lm(logit(mass/t1)~age,data=df) #logistic values for mass divided by the asymptote (an approximation of the curve values for each individual)
@@ -81,7 +88,7 @@ t2 <- new$coef[1] #starting value for "theta2", parameter of the midpoint of the
 t3 <- new$coef[2] #starting value for "theta3", parameter of the rate of growth
 ```
 
-#Logistic Model:
+###Logistic Model:
 ```{r}
 l <- function(age,theta1,theta2,theta3) {theta1/(1+exp(-(theta2+theta3*age)))} #here we're writing out the function for logistic growth (this is how we tell R what function we're using to model growth... like the function in the table in your paper), which estimates parameters "theta1", "theta2", and "theta3" for changes in a variable (like "BW") based on "AGE".
 model.logistic <- nls(mass ~ theta1/(1+exp(-(theta2+theta3*age))), data=df, start=list(theta1=t1,theta2=t2,theta3=t3))
