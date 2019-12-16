@@ -155,8 +155,8 @@ p
 
 ### Lord Model: Something isn't right because every figure looks the same
 ```{r eval=FALSE}
-L <- function(age,gamma,beta,alpha){gamma*exp(-(beta)/age + alpha)}
-lord.model <- nls(mass ~ L(age,gamma,beta,alpha), data=df, start=list(gamma=t1,beta=,alpha=(age))
+L <- function(age,gamma,beta,alpha){gamma*exp(-beta/(x + alpha))}
+lord.model <- nls(mass ~ L(age,gamma,beta,alpha), data=df, start=list(gamma=t1,beta=t3,alpha=)
 summary(lord.model)
 ```
 
