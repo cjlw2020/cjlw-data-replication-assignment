@@ -235,5 +235,13 @@ beta <- c(190,(8.47),0.00145,(0.0000888),0.00117,(0.0000743)) #Values previosuly
 T3.df <- data.frame(Model_name,gamma,alpha,beta)
 ```
 ![](imgg/15.png)
+```{r}
+
+```
+
+## FInal Thoughts
+
+Overall it is hard to tell how thoroughly this paper justifies and analyses it's data because I was unable to replicate it utilzing the same methods. Neither the text/supplementary material included any available code or starting values to indicate how somebody might acheive the same outcome. A link was made available to the reader that was suppose to lead them to available code, but the link was broken. I am unsure if the author or the publisher is at fault. Overall I am proud of the code I was able to provide given the circumstances and I wish you a Happy Holiday. 
+
 
 
