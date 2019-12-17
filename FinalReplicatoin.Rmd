@@ -22,7 +22,11 @@ After re-reading the paper multiple times I have determined that the Lord Model,
 Provided in a txt. file were hog deer age, lens mass, and tag number. From the original text I will be attempting to recreate Table 1, Table 2, and Figure 1. 
 
 ![](imgg/OG Table 1.png)
+
+
 ![](imgg/OG Table 3.png)
+
+
 ![](imgg/OG Figure 1.png)
 
 ## Packages Needed
@@ -42,14 +46,18 @@ head(df)
 ```
 
 ```{r eval=FALSE}
-summary(df) #Just for my informational purpouses
+summary(df) #Just for my informational purposes
 ```
+![](imgg/1.png)
+
 ```{r eval=FALSE}
-plot(df) #A first look at the provided data
+plot(df) #A first look at the provided data plot
 ```
+![](imgg/2.png)
 ## Non-linear least squares attempt:
 
-We had no gone over non-linear models in class before so I felt that it was important for me to get a beter grasp of how R processes this information. Below I follow a series of steps to create a basic non-liner least squares regression that follows my data. 
+We had never gone over non-linear models in class before so I felt that it was important for me to get a beter grasp of how R processes this information. Below I follow a series of steps to create a basic non-liner least squares regression that follows my data.
+
 ```{r eval=FALSE}
 mass <- c(df$mass)
 age1 <- c(df$age)
@@ -62,18 +70,20 @@ cor(mass,predict(m)) #This is an indicator of how well the model fits the data. 
 plot(age,mass) 
 lines(age,predict(m),lty=2,col="red",lwd=3) #Plot the model agenst the data
 ```
-### Finding the Rate of Growth
+![](imgg/3.png)
+
+
+### Determining the rate of growth
 
 Here I attempt to determin the logarithmic rate of growth for the models below
 ```{r eval=FALSE}
-RoG <- (log(max(mass)/min(mass)))/(max(age)) 
-RoG
+RoG <- (log(max(mass)/min(mass)))/(max(age)) #Equation for logarithmic growth
 ```
 ```{r eval=FALSE}
 a_start<- 0.2 #param a is the y value when "x=0"
 b_start<- 0.06523683 #b is the growth rate
 k <-nls(mass~a*exp(-b*age),start=list(a=a_start,b=b_start))
-cor(mass,predict(k)) #The predicted outcome is not as good as the previos attempt
+cor(mass,predict(k)) #The predicted outcome is not as good as the previos attempt. For the nls attempt prior the value = 0.96. Here the value = 0.81
 ```
 
 ```{r eval=FALSE}
@@ -87,10 +97,10 @@ From the original paper I attempted to recreate 3 of the 5 statistical models. I
 
 ### Starting Variables
 ```{r eval=FALSE}
-t1 <- max(mass) #maximum value from the data, our starting  value for "theta1", parameter for the asymptote of growth
-new <- lm(logit(mass/t1)~age,data=df) #logistic values for mass divided by the asymptote (an approximation of the curve values for each individual)
-t2 <- new$coef[1] #starting value for "theta2", parameter of the midpoint of the growth curve
-t3 <- new$coef[2] #starting value for "theta3", parameter of the rate of growth
+t1 <- max(mass) #starting  value for "gamma", parameter for the asymptote of growth
+new <- lm(logit(mass/t1)~age,data=df)
+t2 <- new$coef[1] #starting value for "beta", parameter of the midpoint of the growth curve
+t3 <- new$coef[2] #starting value for "alpha", parameter of the rate of growth
 ```
 
 ### Logistic Model:
@@ -99,17 +109,21 @@ l <- function(age,gamma,alpha,beta) {gamma/(1+exp(-(alpha+beta*age)))}
 model.logistic <- nls(mass ~ g(age,gamma,alpha,beta), data=df, start=list(gamma=t1,alpha=t2,beta=t3))
 ```
 
+This is my first attempt at plotting the figure similar to the original paper.
+
 ```{r eval=FALSE, fig.width= 4,fig.height=4}
 t <- ggplot(data = df, aes(age,mass)) +
   geom_smooth(model = model.logistic, se = TRUE, color = "red", size = 0.5, linetype = 2, alpha = 0.15)  +
   geom_point(aes(age,mass), size = 1, shape = 21, stroke = 1) +
   theme_test() +
   scale_y_continuous(lim = c(0.20, 0.56), breaks = c(0.24,0.28, 0.32, 0.36, 0.40, 0.44, 0.48, 0.52, 0.56))
-  #scale_x_continuous(lim = c(0, 15), breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
-t <- t + xlab("Age (years)") + ylab("Lens mass (g)") 
+  #scale_x_continuous(lim = c(0, 15), breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) # This section is removed becasue it wouldn't run. I don't know why it wouldn't let me alter the x scale the same as the y scale.
+t <- t + xlab("Age (years)") + ylab("Lens mass (g)") #
 t
 ```
-### Trying to place model properly into graph, not working
+
+### More attempts at embeding the logistic model into the figures properly. 
+
 ```{r eval=FALSE, fig.width= 4,fig.height=4}
 plot(age,mass)
 lines(age,predict(model.logistic),col="red",lty=2,lwd=1)
