@@ -177,17 +177,25 @@ p
 ```
 ![](imgg/11.png)
 
-### Lord Model: Something isn't right because every figure looks the same
+### Lord Model: 
+
+The lord model did not go to plan. As I mentioned above and in class, the lord model used in the original paper used baysian methodology to complete their model. Becasue I'm not sure how to proceed with the a baysian model, I tried to follow the same procedure as the logistic and gompertz models above. 
+
 ```{r eval=FALSE}
 L <- function(age,gamma,beta,alpha){gamma*exp(-beta/(x + alpha))}
 lord.model <- nls(mass ~ L(age,gamma,beta,alpha), data=df, start=list(gamma=t1,beta=t3,alpha=)
-summary(lord.model)
+summary(lord.model) #I was unable to correctly identifiy the starting variables for the lord mode. 
 ```
+
+The remaining code was used based on the incorrect starting variables I came with into class today. 
 
 ```{r eval=FALSE, fig.width= 4,fig.height=4}
 plot(age,mass)
 lines(age,predict(lord.model),col="red",lty=2,lwd=1)
 ```
+![](imgg/12.png)
+
+This was again another attempt to recreate the lord figure from the original paper. 
 
 ```{r eval=FALSE, fig.width= 4,fig.height=4}
 p <- ggplot(data = df, aes(age,mass)) +
@@ -203,16 +211,22 @@ p
 ## Tables
 
 ### Table 1.
+
+Based on the output of the dataframe column "df$age" it was easy enough to count and create strings of variable that woudl represent table 1.
+
 ```{r eval=FALSE}
 Age_class_years <- c(0:10,"Total")
 n <- c(23,20,12,10,19,9,5,3,3,2,5,11)
 T1.df <- data.frame(Age_class_years,n)
 T1.df
 ```
+![](imgg/13.png)
+![](imgg/14.png)
 
 ### Table 3.
 
-Values Pulled from summary statistics for each model above. I previosuly did not change the greek terminology from (theta1,theta2,theta3) to (gamma,alpha,beta) to simplify my anlaysis above. I am now transforming those values to  correctly allign with the original table. 
+Values Pulled from summary statistics for each model above. The values for the lord model represent the failed attempt to estimate the starting parameters.
+
 ```{r}
 Model_name <- c("Lord","Lord stderr","Logistic","Logistic stderr","Gompertz","Gompertz stderr")
 gamma <- c(0.259,(0.003),0.488,(0.006),0.495,(0.007)) #Values previoulsy allign with theta1
