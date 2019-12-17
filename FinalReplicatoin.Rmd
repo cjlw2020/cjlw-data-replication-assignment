@@ -90,6 +90,7 @@ cor(mass,predict(k)) #The predicted outcome is not as good as the previos attemp
 plot(age,mass)
 lines(age,predict(k),col="red",lty=2,lwd=3) #Something in this model did not line up correctly. As you can see from the figure below, my line does not trend with the data
 ```
+![](imgg/4.png)
 
 ## Starting Models
 
@@ -104,10 +105,14 @@ t3 <- new$coef[2] #starting value for "alpha", parameter of the rate of growth
 ```
 
 ### Logistic Model:
+
 ```{r eval=FALSE}
 l <- function(age,gamma,alpha,beta) {gamma/(1+exp(-(alpha+beta*age)))}
 model.logistic <- nls(mass ~ g(age,gamma,alpha,beta), data=df, start=list(gamma=t1,alpha=t2,beta=t3))
+
+summary(model.logistic) #Parameter gamma estimate and Std. error are the same as the values from the original paper. Parameters alpha and beta do not share the same values. 
 ```
+![](imgg/7.png)
 
 This is my first attempt at plotting the figure similar to the original paper.
 
@@ -121,6 +126,7 @@ t <- ggplot(data = df, aes(age,mass)) +
 t <- t + xlab("Age (years)") + ylab("Lens mass (g)") #
 t
 ```
+![](imgg/5.png)
 
 ### More attempts at embeding the logistic model into the figures properly. 
 
@@ -128,33 +134,36 @@ t
 plot(age,mass)
 lines(age,predict(model.logistic),col="red",lty=2,lwd=1)
 ```
-Confidence interval maybe
-```{r eval=FALSE}
-conf <- confint(model.logistic)
-conf
-```
+![](imgg/6.png)
 
-```{r eval=FALSE}
+```{r eval=FALSE, fig.width= 4,fig.height=4}
 plot(mass ~ age) #this doesnt work, tried to figure out the confidence interval
-lines(age, fitted(model.logistic), lty = 2, col = "red", lwd = 2)
+lines(age, fitted(model.logistic), lty = 2, col = "red", lwd = 2) #I looked into defining the confidence interval but I was unsucessful. The below code is the reminants of that. 
+
 #lines(age, model.logistic(1:100, conf[1, 1], conf[2, 1], conf[3, 1], conf[4, 1]), lty = 2, 
     #lwd = 1, col = "blue")
 #lines(age, model.logistic(1:100, conf[1, 2], conf[2, 2], conf[3, 2], conf[4, 2]), lty = 2, 
     #lwd = 1, col = "blue")
 ```
+![](imgg/9.png)
 
 ### Gompertz Modle: 
-For Gompertz, everything the same, but the equation/function used (again, for Lord you'd get this from translating the model equations in your table to R code):
+
+The equation is the only differnce between the Logistic and Gomperts models below. 
+
 ```{r eval=FALSE}
 g <- function(age,gamma,alpha,beta){gamma*exp(-exp(-(beta*(age-alpha))))}
 model.gompertz <- nls(mass ~ gamma*exp(-exp(-(beta*(age-alpha)))), data=df, start=list(gamma=t1,alpha=t2,beta=t3))
 
 summary(model.gompertz)
 ```
+![](imgg/8.png)
+
 ```{r eval=FALSE, fig.width= 4,fig.height=4}
 plot(age,mass)
 lines(age, predict(model.gompertz),col="red",lty=2,lwd=1)
 ```
+![](imgg/10.png)
 
 ```{r eval=FALSE, fig.width= 4,fig.height=4}
 p <- ggplot(data = df, aes(age,mass)) +
@@ -166,6 +175,7 @@ p <- ggplot(data = df, aes(age,mass)) +
 p <- p + xlab("Age (years)") + ylab("Lens mass (g)") 
 p
 ```
+![](imgg/11.png)
 
 ### Lord Model: Something isn't right because every figure looks the same
 ```{r eval=FALSE}
